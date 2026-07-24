@@ -5,7 +5,7 @@ class U_Net(nn.Module):
     def __init__(self , in_channels=3 , num_classes=19):
         super(U_Net , self).__init__()
 
-        def conv_block(self , in_channels , out_channels):
+        def conv_block(in_channels , out_channels):
             return nn.Sequential(
                 nn.Conv2d(in_channels , out_channels , kernel_size=3 , padding=1),
                 nn.BatchNorm2d(out_channels),
