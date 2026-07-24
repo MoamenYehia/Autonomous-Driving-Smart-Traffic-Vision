@@ -40,9 +40,9 @@ class CityScapesDataset(Dataset):
 
 
 class CityscapesDataLoader:
-    def __init__(self ,dataset, batch_size=4 , shuffle=True , num_workers=2):
+    def __init__(self ,dataset, batch_size=4 , shuffle=True ):
         self.dataloader=DataLoader(dataset=dataset ,
-         batch_size=batch_size , shuffle=shuffle , num_workers=num_workers)
+         batch_size=batch_size , shuffle=shuffle)
 
     def get_loader(self):
         return self.dataloader    
@@ -59,5 +59,5 @@ train_dataset=CityScapesDataset(IMAGE_TRAIN_DIR , LABEL_TRAIN_DIR)
 val_dataset=CityScapesDataset(IMAGE_VAL_DIR , LABEL_VAL_DIR)
 
 
-train_dataloader=CityscapesDataLoader(train_dataset , batch_size=4 , shuffle=True , num_workers=2)
-val_dataloader=CityscapesDataLoader(val_dataset , batch_size=4 , shuffle=False , num_workers=2)
+train_dataloader=CityscapesDataLoader(train_dataset , batch_size=4 , shuffle=True).get_loader()
+val_dataloader=CityscapesDataLoader(val_dataset , batch_size=4 , shuffle=False).get_loader()

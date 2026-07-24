@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from UNetModel import UNet
+from UNetModel import U_Net
 from DataLoading import CityScapesDataset, CityscapesDataLoader,train_dataloader,val_dataloader , train_dataset , val_dataset
 from tqdm import tqdm
 
@@ -15,17 +15,17 @@ SAVE_PATH= "utils/model.pth"
 DEVICE= torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Using device: {DEVICE}")
 
-model=UNet(n_channels=3 , n_classes=NUM_CLASSES)
+model=U_Net(in_channels=3 , num_classes=NUM_CLASSES)
 model.to(DEVICE)
 
 
 criterion=nn.CrossEntropyLoss()
 optimizer=optim.Adam(model.parameters() , lr=LEARNING_RATE)
 
-def train_fn(loader ,model ,optimizer,criterion,scaler=None):
+def train_fn(train_dataloader ,model ,optimizer,criterion):
     model.train()
     running_loss=0.0
-    loop=tqdm(loader , desc="Training" , leave=True)
+    loop=tqdm(train_dataloader , desc="Training" , leave=True)
 
     for images , labels in loop:
         images=images.to(DEVICE)
@@ -43,16 +43,16 @@ def train_fn(loader ,model ,optimizer,criterion,scaler=None):
         optimizer.step()
 
         running_loss+=loss.item()
-        loop.set_postfix(loss=running_loss/len(loader))
+        loop.set_postfix(loss=running_loss/len(train_dataloader))
 
-        return running_loss/len(loader)
+        return running_loss/len(train_dataloader)
 
 
-def check_validation(loader , model , criterion):
+def check_validation(val_dataloader , model , criterion):
     model.eval()
     running_val_loss=0.0
     with torch.no_grad():
-        loop=tqdm(loader , desc="Validation" , leave=True)
+        loop=tqdm(val_dataloader , desc="Validation" , leave=True)
         for images , labels in loop :
             images=images.to(DEVICE)
             labels=labels.to(DEVICE)
@@ -61,9 +61,9 @@ def check_validation(loader , model , criterion):
             loss=criterion(predictions , labels)
 
             running_val_loss+=loss.item()
-            loop.set_postfix(val_loss=running_val_loss/len(loader)) 
+            loop.set_postfix(val_loss=running_val_loss/len(val_dataloader)) 
 
-            return running_val_loss/len(loader)
+            return running_val_loss/len(val_dataloader)
 
 best_val_loss=float("inf")
 
